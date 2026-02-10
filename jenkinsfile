@@ -1,7 +1,8 @@
 pipeline {
     agent any
     
-    // Define environment variables to fetch Jenkins credentials
+
+// Define environment variables to fetch Jenkins credentials
     // 'anypoint-user-pass' should be a "Username with password" credential in Jenkins
     // 'anypoint-client-id-secret' should be a "Secret text" or "Username with password" (using user as client_id and password as client_secret) credential
     environment {
@@ -38,3 +39,4 @@ pipeline {
         }
     }
 }
+
