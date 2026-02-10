@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    // Define environment variables to fetch Jenkins credentials
+    // 'anypoint-user-pass' should be a "Username with password" credential in Jenkins
+    // 'anypoint-client-id-secret' should be a "Secret text" or "Username with password" (using user as client_id and password as client_secret) credential
+    environment {
+        // Assuming Jenkins credentials IDs are 'ANYPOINT_USERNAME', 'ANYPOINT_PASSWORD', etc.
+        ANYPOINT_USR = credentials('ANYPOINT_USERNAME')
+        ANYPOINT_PWD = credentials('ANYPOINT_PASSWORD')
+        CLIENT_ID = credentials('ANYPOINT_CLIENT_ID')
+        CLIENT_SECRET = credentials('ANYPOINT_CLIENT_SECRET')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Replace with your source code management details if not using 'Pipeline script from SCM'
+                git url: 'https://github.com', branch: 'main'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                echo 'Building the application'
+                // Executes the Maven clean install command
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Deploy to CloudHub 2.0') {
+            steps {
+                echo 'Deploying to CloudHub 2.0'
+                // Executes the Maven deploy goal with CloudHub 2.0 specific parameters
+                // Parameters are passed as system properties using -D
+                sh 'mvn clean package deploy -DmuleDeploy -Danypoint.platform.client_id=$CLIENT_ID -Danypoint.platform.client_secret=$CLIENT_SECRET -Danypoint.platform.username=$ANYPOINT_USR -Danypoint.platform.password=$ANYPOINT_PWD -Danypoint.platform.environment=Sandbox -Danypoint.platform.organizationId=YOUR_ORG_ID -DapplicationName=your-hello-world-app-name -DmuleVersion=4.4.0 -Dtarget=CloudHub-2.0 -Dtarget.organizationId=YOUR_ORG_ID -Dtarget.environmentId=YOUR_ENV_ID -Dreplicas=1 -DvCores=0.1'
+            }
+        }
+    }
+}
