@@ -1,42 +1,59 @@
 pipeline {
     agent any
-    
 
-// Define environment variables to fetch Jenkins credentials
-    // 'anypoint-user-pass' should be a "Username with password" credential in Jenkins
-    // 'anypoint-client-id-secret' should be a "Secret text" or "Username with password" (using user as client_id and password as client_secret) credential
     environment {
-        // Assuming Jenkins credentials IDs are 'ANYPOINT_USERNAME', 'ANYPOINT_PASSWORD', etc.
-        ANYPOINT_USR = credentials('ANYPOINT_USERNAME')
-        ANYPOINT_PWD = credentials('ANYPOINT_PASSWORD')
-        CLIENT_ID = credentials('ANYPOINT_CLIENT_ID')
-        CLIENT_SECRET = credentials('ANYPOINT_CLIENT_SECRET')
+        // Define credentials stored in Jenkins as Secret Text, e.g., 'anypoint-credentials'
+        //ANYPOINT_CREDENTIALS = credentials('anypoint-credentials')
+		ANYPOINT_CREDENTIALS_USR=credentials('ANYPOINT_CREDENTIALS_USR')
+		ANYPOINT_CREDENTIALS_PSW=credentials('ANYPOINT_CREDENTIALS_PSW')
+        // Other environment-specific properties can be defined here or passed as parameters
+    }
+
+   tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "M3"
     }
 
     stages {
-        stage('Checkout') {
+         stage('Checkout Code') {
             steps {
-                // Replace with your source code management details if not using 'Pipeline script from SCM'
-                git url: 'https://github.com', branch: 'main'
+                git(
+                    url: 'https://github.com/giribabus/helloworld.git', // Use your repo URL
+                    credentialsId: 'git_token', // Use your credential ID
+                    branch: 'main' // Specify the branch name
+                )
             }
         }
-        
-        stage('Build') {
+        stage('Build Application') {
             steps {
-                echo 'Building the application'
-                // Executes the Maven clean install command
-                sh 'mvn clean install'
+                echo 'Building the MuleSoft application...'
+                // The 'clean install' Maven command compiles and packages the application
+                bat 'mvn clean install' 
             }
         }
 
-        stage('Deploy to CloudHub 2.0') {
+        stage('Run Unit Tests') {
             steps {
-                echo 'Deploying to CloudHub 2.0'
-                // Executes the Maven deploy goal with CloudHub 2.0 specific parameters
-                // Parameters are passed as system properties using -D
-                sh 'mvn clean package deploy -DmuleDeploy -Danypoint.platform.client_id=$CLIENT_ID -Danypoint.platform.client_secret=$CLIENT_SECRET -Danypoint.platform.username=$ANYPOINT_USR -Danypoint.platform.password=$ANYPOINT_PWD -Danypoint.platform.environment=Sandbox -Danypoint.platform.organizationId=YOUR_ORG_ID -DapplicationName=your-hello-world-app-name -DmuleVersion=4.4.0 -Dtarget=CloudHub-2.0 -Dtarget.organizationId=YOUR_ORG_ID -Dtarget.environmentId=YOUR_ENV_ID -Dreplicas=1 -DvCores=0.1'
+                echo 'Running MUnit tests...'
+                // The 'test' goal in Munit Maven plugin executes unit tests
+                bat 'mvn test' 
+            }
+        }
+      stage('Build and SonarQube Analysis') {
+            // The withSonarQubeEnv block automatically injects the server configuration
+            steps {
+                withSonarQubeEnv(credentialsId: 'SONARQUBE_TOKEN_ID', installationName: 'SonarQube') { // Match names to your Jenkins config
+                    bat 'mvn clean install sonar:sonar -Dsonar.projectKey=giribabus_helloworld -Dsonar.sources=src/main/mule' // Modify projectKey and sources path as needed
+                }
+            }
+        }
+        stage('Deploy to CloudHub') {
+            steps {
+                echo 'Deploying to the configured environment...'
+                // Deploy command uses the Mule Maven Plugin configuration from pom.xml
+                // Credentials are injected securely via environment variables
+                bat 'mvn clean deploy -DmuleDeploy -Dusername=${ANYPOINT_CREDENTIALS_USR} -Dpassword=${ANYPOINT_CREDENTIALS_PSW}'
             }
         }
     }
 }
-
