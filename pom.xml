@@ -55,7 +55,7 @@
 						<!-- This is only needed if you want to use your credentials stored in your Maven settings.xml file. This is not the Mule server name. -->
 						<server>anypoint-exchange-v3</server>
 						<!-- <username>giri_relanto_ai</username>
-						<password>Sagg$1974</password> -->
+						<password>xxxxx</password> -->
 						<applicationName>helloworld</applicationName>
 						<replicas>1</replicas>
 						<vCores>0.1</vCores>
