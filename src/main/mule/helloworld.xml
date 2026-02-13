@@ -8,6 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3f5d7624-aee6-4161-9426-721a592c7769" >
 		<http:listener-connection host="0.0.0.0" port="${http.port}" />
 	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c5504c18-7348-44df-89cc-99c3f612383c" file="config-dev.yaml" />
 	<flow name="helloworldFlow" doc:id="f81a3d48-5f6d-4718-b206-df517e33dfe7" >
 		<http:listener doc:name="Listener" doc:id="6c1e6ac6-bc40-4fc5-a9e8-6e89f6bcd82f" config-ref="HTTP_Listener_config" path="/hello"/>
 		<logger level="INFO" doc:name="Logger" doc:id="9e9276ef-5ebd-4e17-a602-a163f3f18465" message="before transform message"/>

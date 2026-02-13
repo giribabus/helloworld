@@ -16,10 +16,9 @@
 		<app.runtime>4.9.9</app.runtime>
 		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
 		<exchange.mule.maven.plugin>0.0.13</exchange.mule.maven.plugin>
-			
-  		<sonar.organization>giribabus</sonar.organization>
+		<sonar.organization>giribabus</sonar.organization>
+		<munit.version>3.4.0</munit.version>
 	</properties>
-	
 	<distributionManagement>
 		<repository>
 			<id>anypoint-exchange-v3</id>
@@ -28,7 +27,6 @@
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
-	
 	<build>
 		<plugins>
 			<plugin>
@@ -37,7 +35,7 @@
 				<version>3.2.0</version>
 			</plugin>
 
-<!-- Modified to add CH 2.0 deployment settings -->
+			<!-- Modified to add CH 2.0 deployment settings -->
 			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
@@ -55,7 +53,7 @@
 						<javaVersion>17</javaVersion>
 						<releaseChannel>Edge</releaseChannel>
 						<!-- This is only needed if you want to use your credentials stored in your Maven settings.xml file. This is not the Mule server name. -->
-						 <server>anypoint-exchange-v3</server> 
+						<server>anypoint-exchange-v3</server>
 						<!-- <username>giri_relanto_ai</username>
 						<password>Sagg$1974</password> -->
 						<applicationName>helloworld</applicationName>
@@ -74,6 +72,29 @@
 					</cloudhub2Deployment>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+				<version>${munit.version}</version>
+				<executions>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+							<goal>coverage-report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<coverage>
+						<runCoverage>true</runCoverage>
+						<formats>
+							<format>html</format>
+						</formats>
+					</coverage>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -89,6 +110,26 @@
 			<artifactId>mule-sockets-connector</artifactId>
 			<version>1.2.6</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<version>3.4.0</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<version>3.4.0</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.weave</groupId>
+			<artifactId>assertions</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -118,7 +159,4 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	
-
-
 </project>
