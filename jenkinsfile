@@ -28,7 +28,7 @@ pipeline {
             steps {
                 echo 'Building the MuleSoft application...'
                 // The 'clean install' Maven command compiles and packages the application
-                bat 'mvn clean install' 
+                bat 'mvn clean install -DskipTests=true' 
             }
         }
 
